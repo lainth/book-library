@@ -3,11 +3,13 @@ const tbody = document.querySelector("tbody");
 let j = 0;
 let myLibrary = [];
 
-function Book(title, author, pages, read) {
-  this.title = title;
-  this.author = author;
-  this.pages = pages;
-  this.read = read;
+class Book {
+  constructor(title, author, pages, read) {
+    this.title = title;
+    this.author = author;
+    this.pages = pages;
+    this.read = read;
+  }
 }
 
 function addBookToLibrary() {
@@ -17,7 +19,6 @@ function addBookToLibrary() {
   let bookStatus = document.getElementById("status").value;
   let newBook = new Book(bookTitle, bookAuthor, bookPages, bookStatus);
   myLibrary.push(newBook);
-  console.log(myLibrary);
 }
 
 function clearFields() {
@@ -30,33 +31,54 @@ function clearFields() {
 function displayBooks(index) {
   for (let i = index; i < myLibrary.length; i++) {
     const tr = document.createElement("tr");
+    tr.setAttribute("id", "tablerow");
+    tr.setAttribute("data-array-idx", index);
     tbody.appendChild(tr);
+
     const th = document.createElement("th");
     th.setAttribute("scope", "row");
     th.textContent = myLibrary[i].title;
     tr.appendChild(th);
+
     const tdAuth = document.createElement("td");
     tdAuth.textContent = myLibrary[i].author;
     tr.appendChild(tdAuth);
+
     const tdPages = document.createElement("td");
     tdPages.textContent = parseInt(myLibrary[i].pages);
     tr.appendChild(tdPages);
+
     const tdRead = document.createElement("td");
     const readButton = document.createElement("button");
     readButton.setAttribute("type", "button");
+    readButton.setAttribute("id", "status-button");
     readButton.classList.add("btn", "btn-light");
     readButton.textContent = myLibrary[i].read;
     tdRead.appendChild(readButton);
     tr.appendChild(tdRead);
+
     const tdDelete = document.createElement("td");
-    const deleteButton = document.createElement("button");
+    const deleteButton = document.createElement("input");
     deleteButton.setAttribute("type", "button");
     deleteButton.setAttribute("id", "delete");
+    deleteButton.setAttribute("value", "Delete");
     deleteButton.classList.add("btn", "btn-danger");
-    deleteButton.textContent = "Delete";
     tdDelete.appendChild(deleteButton);
     tr.appendChild(tdDelete);
   }
+}
+
+function removeBook() {
+  $('input[type="button"]').click(function (e) {
+    e.preventDefault();
+    const getIndex = $(this).closest("tr").attr("data-array-idx");
+    $(this).closest("tr").remove();
+    myLibrary.splice(getIndex, 1);
+    j--;
+    if (j < 0) {
+      j = 0;
+    }
+  });
 }
 
 submitButton.addEventListener("click", (e) => {
@@ -64,5 +86,6 @@ submitButton.addEventListener("click", (e) => {
   addBookToLibrary();
   clearFields();
   displayBooks(j);
+  removeBook();
   j++;
 });
